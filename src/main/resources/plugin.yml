@@ -1,0 +1,4 @@
+name: CustomJoinMessage
+version: '${version}'
+main: org.dark.customjoinmessage.CustomJoinMessage
+api-version: '1.21'
