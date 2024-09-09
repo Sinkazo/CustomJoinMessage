@@ -24,27 +24,27 @@ public class PlayerEventListener implements Listener {
         Player player = event.getPlayer();
         UUID playerId = player.getUniqueId();
 
-        // Obtén el mensaje base de la configuración
+        // Get the base message of the configuration
         String baseJoinMessage = plugin.getConfig().getString("default_messages.join", "&f[&a+&f] %player% &ase conectó &7(&6%playerjoinmessage%&7)");
 
-        // Obtén el mensaje personalizado del jugador
+        // Get the player's personalized message
         String customJoinMessage = plugin.getJoinMessage(playerId);
 
-        // Reemplaza el placeholder %playerjoinmessage% con el mensaje personalizado
+        // Replaces the placeholder %playerjoinmessage% with the custom message
         String finalMessage = baseJoinMessage.replace("%playerjoinmessage%", customJoinMessage);
 
-        // Reemplaza el placeholder %player% con el nombre del jugador
+        // Replaces the placeholder %player% with the player's name
         finalMessage = finalMessage.replace("%player%", player.getName());
 
-        // Si PlaceholderAPI está disponible, reemplaza los placeholders de PlaceholderAPI
+        // If PlaceholderAPI is available. It replaces the PlaceholderAPI placeholders.
         if (plugin.isPlaceholderAPIEnabled()) {
             finalMessage = PlaceholderAPI.setPlaceholders(player, finalMessage);
         }
 
-        // Traduce los códigos de color
+        // Translates color codes
         finalMessage = ChatColor.translateAlternateColorCodes('&', finalMessage);
 
-        // Establece el mensaje de entrada del jugador
+        // Sets the player's join message
         event.setJoinMessage(finalMessage);
     }
 
@@ -53,27 +53,27 @@ public class PlayerEventListener implements Listener {
         Player player = event.getPlayer();
         UUID playerId = player.getUniqueId();
 
-        // Obtén el mensaje base de la configuración
+        // Get the base message of the configuration
         String baseQuitMessage = plugin.getConfig().getString("default_messages.quit", "&f[&c-&f] %player% &cse desconectó &7(&6%playerquitmessage%&7)");
 
-        // Obtén el mensaje personalizado del jugador
+        // Get the player's personalized message
         String customQuitMessage = plugin.getQuitMessage(playerId);
 
-        // Reemplaza el placeholder %playerquitmessage% con el mensaje personalizado
+        // Replaces the placeholder %playerquitmessage% with the custom message
         String finalMessage = baseQuitMessage.replace("%playerquitmessage%", customQuitMessage);
 
-        // Reemplaza el placeholder %player% con el nombre del jugador
+        // Replaces the placeholder %player% with the player's name
         finalMessage = finalMessage.replace("%player%", player.getName());
 
-        // Si PlaceholderAPI está disponible, reemplaza los placeholders de PlaceholderAPI
+        // If PlaceholderAPI is available. It replaces the PlaceholderAPI placeholders.
         if (plugin.isPlaceholderAPIEnabled()) {
             finalMessage = PlaceholderAPI.setPlaceholders(player, finalMessage);
         }
 
-        // Traduce los códigos de color
+        // Replaces the placeholder %player% with the player's name
         finalMessage = ChatColor.translateAlternateColorCodes('&', finalMessage);
 
-        // Establece el mensaje de salida del jugador
+        // Sets the player's quit message
         event.setQuitMessage(finalMessage);
     }
 }
