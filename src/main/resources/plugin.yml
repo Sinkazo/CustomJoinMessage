@@ -5,5 +5,7 @@ api-version: '1.21'
 softdepend:
   - PlaceholderAPI
 commands:
-  CJMCommand:
-     description: Allow player to set his join and quit message
+  cjm:
+    description: Main command for CustomJoinMessage plugin
+    usage: /<command> [reload|setjoinmessage|setquitmessage]
+    aliases: [customjoinmessage]

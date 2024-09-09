@@ -21,7 +21,7 @@ public class PlayerChatListener implements Listener {
     }
 
     public void updateBlockedPatterns() {
-        List<String> blockedWords = plugin.getConfig().getStringList("blocked_words");
+        List<String> blockedWords = plugin.getFileManager().getConfig().getStringList("blocked_words");
         this.blockedPatterns = blockedWords.stream()
                 .map(word -> Pattern.compile("\\b" + Pattern.quote(word) + "\\b", Pattern.CASE_INSENSITIVE))
                 .collect(Collectors.toList());
@@ -59,11 +59,8 @@ public class PlayerChatListener implements Listener {
 
     private boolean containsBlockedWord(String message) {
         for (Pattern pattern : blockedPatterns) {
-            String[] words = message.split("\\s+");
-            for (String word : words) {
-                if (pattern.matcher(word).find()) {
-                    return true;
-                }
+            if (pattern.matcher(message).find()) {
+                return true;
             }
         }
         return false;

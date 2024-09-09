@@ -22,20 +22,21 @@ public final class CustomJoinMessage extends JavaPlugin {
     private Connection connection;
     private FileManager fileManager;
     private final Map<UUID, Boolean> playerConfiguring = new HashMap<>();
-    private final Map<UUID, Boolean> configuringJoinMessage = new HashMap<>(); // Mapa para determinar el tipo de mensaje
+    private final Map<UUID, Boolean> configuringJoinMessage = new HashMap<>();
     private final Map<UUID, String> playerJoinMessages = new HashMap<>();
     private final Map<UUID, String> playerQuitMessages = new HashMap<>();
     private boolean placeholderAPIEnabled = false;
+    private PlayerChatListener playerChatListener;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         fileManager = new FileManager(this);
         connectToDatabase();
-        getCommand("jpm").setExecutor(new CJMCommand(this));
-        getServer().getPluginManager().registerEvents(new PlayerChatListener(this), this);
+        getCommand("cjm").setExecutor(new CJMCommand(this));
+        playerChatListener = new PlayerChatListener(this);
+        getServer().getPluginManager().registerEvents(playerChatListener, this);
         getServer().getPluginManager().registerEvents(new PlayerEventListener(this), this);
-
 
         Plugin placeholderAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI");
         if (placeholderAPI != null) {
@@ -44,10 +45,7 @@ public final class CustomJoinMessage extends JavaPlugin {
         } else {
             getLogger().info("PlaceholderAPI not found, continuing without placeholder support.");
         }
-
-
     }
-
 
     @Override
     public void onDisable() {
@@ -60,6 +58,13 @@ public final class CustomJoinMessage extends JavaPlugin {
         }
     }
 
+    @Override
+    public void reloadConfig() {
+        super.reloadConfig();
+        fileManager.reloadConfig();
+        playerChatListener.updateBlockedPatterns();
+    }
+
     public void connectToDatabase() {
         try {
             String url = "jdbc:mysql://" + fileManager.getConfig().getString("mysql.host") + ":" +
@@ -67,8 +72,8 @@ public final class CustomJoinMessage extends JavaPlugin {
             connection = DriverManager.getConnection(url, fileManager.getConfig().getString("mysql.username"),
                     fileManager.getConfig().getString("mysql.password"));
             getLogger().info("Database connected successfully.");
-            createTablesIfNotExists(); // Ensure tables are created
-            loadMessagesFromDatabase(); // Load existing messages from database
+            createTablesIfNotExists();
+            loadMessagesFromDatabase();
         } catch (SQLException e) {
             getLogger().severe("Could not establish a connection to the database. Disabling plugin.");
             e.printStackTrace();
@@ -132,7 +137,7 @@ public final class CustomJoinMessage extends JavaPlugin {
     }
 
     public boolean isConfiguringJoinMessage(UUID playerId) {
-        return configuringJoinMessage.getOrDefault(playerId, true); // Por defecto, se asume que está configurando join message
+        return configuringJoinMessage.getOrDefault(playerId, true);
     }
 
     public void setPlayerMessage(UUID playerId, String message, boolean isJoinMessage) {
@@ -156,5 +161,9 @@ public final class CustomJoinMessage extends JavaPlugin {
 
     public boolean isPlaceholderAPIEnabled() {
         return placeholderAPIEnabled;
+    }
+
+    public FileManager getFileManager() {
+        return fileManager;
     }
 }
