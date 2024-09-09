@@ -6,6 +6,7 @@ public final class CustomJoinMessage extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        // Esto es una prueba
         // Plugin startup logic
 
     }
