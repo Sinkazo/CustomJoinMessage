@@ -22,7 +22,10 @@ public class CJMCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage("This command can only be used by players.");
+            // Get message from config.yml and translate color codes
+            String consoleMessage = ChatColor.translateAlternateColorCodes('&',
+                    plugin.getConfig().getString("messages.console_only", "&cThis command can only be used by players."));
+            sender.sendMessage(consoleMessage);
             return true;
         }
 
@@ -31,9 +34,15 @@ public class CJMCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
             if (player.hasPermission("cjm.reload")) {
                 plugin.reloadConfig();
-                player.sendMessage("Config reloaded successfully!");
+                // Get message from config.yml and translate color codes
+                String reloadMessage = ChatColor.translateAlternateColorCodes('&',
+                        plugin.getConfig().getString("messages.config_reloaded", "&aConfig reloaded successfully!"));
+                player.sendMessage(reloadMessage);
             } else {
-                player.sendMessage("You don't have sufficient permissions.");
+                // Get message from config.yml and translate color codes
+                String noPermissionMessage = ChatColor.translateAlternateColorCodes('&',
+                        plugin.getConfig().getString("messages.no_permission", "&cYou don't have sufficient permissions."));
+                player.sendMessage(noPermissionMessage);
             }
             return true;
         }
@@ -42,10 +51,21 @@ public class CJMCommand implements CommandExecutor, TabCompleter {
             if (player.hasPermission("cjm.join")) {
                 plugin.setPlayerConfiguring(player.getUniqueId(), true);
                 plugin.setConfiguringJoinMessage(player.getUniqueId(), true);
-                player.sendTitle("Configuration", "Write your connection message in the chat", 10, 70, 20);
-                player.sendMessage(ChatColor.GOLD + "Now you are in the configuration mode. Type" + ChatColor.RED + " cancel " + ChatColor.GOLD + "to exit.");
+                // Get title and subtitle from config.yml and translate color codes
+                String configTitle = ChatColor.translateAlternateColorCodes('&',
+                        plugin.getConfig().getString("messages.config_title", "&eConfiguration"));
+                String joinSubtitle = ChatColor.translateAlternateColorCodes('&',
+                        plugin.getConfig().getString("messages.join_subtitle", "&aWrite your join message in the chat"));
+                player.sendTitle(configTitle, joinSubtitle, 10, 70, 20);
+                // Get configuration mode message from config.yml and translate color codes
+                String configModeMessage = ChatColor.translateAlternateColorCodes('&',
+                        plugin.getConfig().getString("messages.config_mode", "&6Now you are in configuration mode. Type &c'cancel' &6to exit."));
+                player.sendMessage(configModeMessage);
             } else {
-                player.sendMessage("You don't have sufficient permissions.");
+                // Get message from config.yml and translate color codes
+                String noPermissionMessage = ChatColor.translateAlternateColorCodes('&',
+                        plugin.getConfig().getString("messages.no_permission", "&cYou don't have sufficient permissions."));
+                player.sendMessage(noPermissionMessage);
             }
             return true;
         }
@@ -54,22 +74,36 @@ public class CJMCommand implements CommandExecutor, TabCompleter {
             if (player.hasPermission("cjm.quit")) {
                 plugin.setPlayerConfiguring(player.getUniqueId(), true);
                 plugin.setConfiguringJoinMessage(player.getUniqueId(), false);
-                player.sendTitle("Configuration", "Write your disconnection message in chat", 10, 70, 20);
-                player.sendMessage(ChatColor.GOLD + "Now you are in the configuration mode. Type" + ChatColor.RED + " cancel " + ChatColor.GOLD + "to exit.");
+                // Get title and subtitle from config.yml and translate color codes
+                String configTitle = ChatColor.translateAlternateColorCodes('&',
+                        plugin.getConfig().getString("messages.config_title", "&eConfiguration"));
+                String quitSubtitle = ChatColor.translateAlternateColorCodes('&',
+                        plugin.getConfig().getString("messages.quit_subtitle", "&aWrite your quit message in the chat"));
+                player.sendTitle(configTitle, quitSubtitle, 10, 70, 20);
+                // Get configuration mode message from config.yml and translate color codes
+                String configModeMessage = ChatColor.translateAlternateColorCodes('&',
+                        plugin.getConfig().getString("messages.config_mode", "&6Now you are in configuration mode. Type &c'cancel' &6to exit."));
+                player.sendMessage(configModeMessage);
             } else {
-                player.sendMessage("You don't have sufficient permissions.");
+                // Get message from config.yml and translate color codes
+                String noPermissionMessage = ChatColor.translateAlternateColorCodes('&',
+                        plugin.getConfig().getString("messages.no_permission", "&cYou don't have sufficient permissions."));
+                player.sendMessage(noPermissionMessage);
             }
             return true;
         }
 
-        player.sendMessage("Invalid command. Usage: /cjm setjoinmessage | setquitmessage | reload");
+        // Get invalid command usage message from config.yml and translate color codes
+        String invalidCommandMessage = ChatColor.translateAlternateColorCodes('&',
+                plugin.getConfig().getString("messages.invalid_command", "&cInvalid command. Usage: /cjm setjoinmessage | setquitmessage | reload"));
+        player.sendMessage(invalidCommandMessage);
         return true;
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            // Devuelve la lista de subcomandos disponibles para el primer argumento
+            // Return a list of available subcommands for the first argument
             return Arrays.asList("reload", "setjoinmessage", "setquitmessage");
         }
         return new ArrayList<>();

@@ -1,12 +1,12 @@
 package org.dark.customjoinmessage.Listeners;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.entity.Player;
-import org.bukkit.ChatColor;
 import org.dark.customjoinmessage.CustomJoinMessage;
 
 import java.util.UUID;
@@ -24,27 +24,25 @@ public class PlayerEventListener implements Listener {
         Player player = event.getPlayer();
         UUID playerId = player.getUniqueId();
 
-        // Get the base message of the configuration
-        String baseJoinMessage = plugin.getConfig().getString("default_messages.join", "&f[&a+&f] %player% &ase conectó &7(&6%playerjoinmessage%&7)");
+        // Get the base join message from config.yml
+        String baseJoinMessage = plugin.getConfig().getString("messages.join", "&f[&a+&f] %player% &ajoined &7(&6%playerjoinmessage%&7)");
 
-        // Get the player's personalized message
+        // Get the player's custom join message
         String customJoinMessage = plugin.getJoinMessage(playerId);
 
-        // Replaces the placeholder %playerjoinmessage% with the custom message
-        String finalMessage = baseJoinMessage.replace("%playerjoinmessage%", customJoinMessage);
+        // Replace placeholders
+        String finalMessage = baseJoinMessage.replace("%playerjoinmessage%", customJoinMessage)
+                .replace("%player%", player.getName());
 
-        // Replaces the placeholder %player% with the player's name
-        finalMessage = finalMessage.replace("%player%", player.getName());
-
-        // If PlaceholderAPI is available. It replaces the PlaceholderAPI placeholders.
+        // If PlaceholderAPI is enabled, replace additional placeholders
         if (plugin.isPlaceholderAPIEnabled()) {
             finalMessage = PlaceholderAPI.setPlaceholders(player, finalMessage);
         }
 
-        // Translates color codes
+        // Translate color codes
         finalMessage = ChatColor.translateAlternateColorCodes('&', finalMessage);
 
-        // Sets the player's join message
+        // Set the join message
         event.setJoinMessage(finalMessage);
     }
 
@@ -53,27 +51,25 @@ public class PlayerEventListener implements Listener {
         Player player = event.getPlayer();
         UUID playerId = player.getUniqueId();
 
-        // Get the base message of the configuration
-        String baseQuitMessage = plugin.getConfig().getString("default_messages.quit", "&f[&c-&f] %player% &cse desconectó &7(&6%playerquitmessage%&7)");
+        // Get the base quit message from config.yml
+        String baseQuitMessage = plugin.getConfig().getString("messages.quit", "&f[&c-&f] %player% &cleft &7(&6%playerquitmessage%&7)");
 
-        // Get the player's personalized message
+        // Get the player's custom quit message
         String customQuitMessage = plugin.getQuitMessage(playerId);
 
-        // Replaces the placeholder %playerquitmessage% with the custom message
-        String finalMessage = baseQuitMessage.replace("%playerquitmessage%", customQuitMessage);
+        // Replace placeholders
+        String finalMessage = baseQuitMessage.replace("%playerquitmessage%", customQuitMessage)
+                .replace("%player%", player.getName());
 
-        // Replaces the placeholder %player% with the player's name
-        finalMessage = finalMessage.replace("%player%", player.getName());
-
-        // If PlaceholderAPI is available. It replaces the PlaceholderAPI placeholders.
+        // If PlaceholderAPI is enabled, replace additional placeholders
         if (plugin.isPlaceholderAPIEnabled()) {
             finalMessage = PlaceholderAPI.setPlaceholders(player, finalMessage);
         }
 
-        // Replaces the placeholder %player% with the player's name
+        // Translate color codes
         finalMessage = ChatColor.translateAlternateColorCodes('&', finalMessage);
 
-        // Sets the player's quit message
+        // Set the quit message
         event.setQuitMessage(finalMessage);
     }
 }

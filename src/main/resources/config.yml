@@ -7,10 +7,26 @@ mysql:
   password: "password"      # User password
 
 # Predetermined join and quit messages
-default_messages:
+messages:
+  #You can use ANY PlaceholderAPI. Example: %luckperms_prefix%, %server_online%, etc.
   join: "&f[&a+&f] %player% &ahas joinned &7(&6%playerjoinmessage%&7)"
   quit: "&f[&c-&f] %player% &chas disconnected &7(&6%playerquitmessage%&7)"
 
+  blocked_message: "&cYour message contains a prohibited word and has been cancelled."
+  cancel_message: "&eMessage configuration has been cancelled."
+
+  console_only: "&cThis command can only be used by players."
+  no_permission: "&cYou don't have sufficient permissions."
+
+  config_reloaded: "&aConfig reloaded successfully!"
+
+  set_message: "&aYour message has been set to: &f%message%"
+  config_title: "&eConfiguration"
+  join_subtitle: "&aWrite your join message in the chat"
+  quit_subtitle: "&aWrite your quit message in the chat"
+  config_mode: "&6Now you are in configuration mode. Type &c'cancel' &6to exit."
+
+  invalid_command: "&cInvalid command. Usage: /cjm setjoinmessage | setquitmessage | reload"
 # List of blocked words
 blocked_words:
   - idiot
