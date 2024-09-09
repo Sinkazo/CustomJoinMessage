@@ -30,13 +30,17 @@ public final class CustomJoinMessage extends JavaPlugin {
 
     @Override
     public void onEnable() {
+
         saveDefaultConfig();
         fileManager = new FileManager(this);
         connectToDatabase();
+
         CJMCommand cjmCommand = new CJMCommand(this);
         this.getCommand("cjm").setExecutor(cjmCommand);
         this.getCommand("cjm").setTabCompleter(cjmCommand);
+
         playerChatListener = new PlayerChatListener(this);
+
         getServer().getPluginManager().registerEvents(playerChatListener, this);
         getServer().getPluginManager().registerEvents(new PlayerEventListener(this), this);
 
