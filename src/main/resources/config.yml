@@ -1,0 +1,18 @@
+# MySQL configuration
+mysql:
+  host: "localhost"         # MySQL server address
+  port: 3306                # MySQL server port (default 3306)
+  database: "mydatabase"    # Database name
+  username: "root"          # Database user
+  password: "password"      # User password
+
+# Predetermined join and quit messages
+default_messages:
+  join: "&f[&a+&f] %player% &ahas joinned &7(&6%playerjoinmessage%&7)"
+  quit: "&f[&c-&f] %player% &chas disconnected &7(&6%playerquitmessage%&7)"
+
+# List of blocked words
+blocked_words:
+  - idiot
+  - nigger
+  - fuck

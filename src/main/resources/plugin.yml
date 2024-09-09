@@ -2,3 +2,8 @@ name: CustomJoinMessage
 version: '${version}'
 main: org.dark.customjoinmessage.CustomJoinMessage
 api-version: '1.21'
+softdepend:
+  - PlaceholderAPI
+commands:
+  CJMCommand:
+     description: Allow player to set his join and quit message
