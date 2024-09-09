@@ -45,7 +45,7 @@ public class CJMCommand implements CommandExecutor {
             return true;
         }
 
-        player.sendMessage("Invalid command. Usage: /jpm setjoinmessage | setquitmessage | reload");
+        player.sendMessage("Invalid command. Usage: /cjm setjoinmessage | setquitmessage | reload");
         return true;
     }
 }

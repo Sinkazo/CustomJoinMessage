@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.dark.customjoinmessage.CustomJoinMessage;
 
 import java.util.List;
@@ -55,6 +56,17 @@ public class PlayerChatListener implements Listener {
             player.sendMessage("Your message has been set to: " + message);
             plugin.setPlayerConfiguring(player.getUniqueId(), false);
         }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event){
+        Player p = event.getPlayer();
+
+        if (plugin.isPlayerConfiguring(p.getUniqueId())){
+            plugin.setPlayerConfiguring(p.getUniqueId(), false);
+
+        }
+
     }
 
     private boolean containsBlockedWord(String message) {
