@@ -3,6 +3,10 @@ package org.dark.customjoinmessage;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.dark.customjoinmessage.Commands.CJMCommand;
+import org.dark.customjoinmessage.Listeners.PlayerChatListener;
+import org.dark.customjoinmessage.Listeners.PlayerEventListener;
+import org.dark.customjoinmessage.Utilities.FileManager;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

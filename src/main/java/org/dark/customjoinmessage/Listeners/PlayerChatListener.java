@@ -1,10 +1,11 @@
-package org.dark.customjoinmessage;
+package org.dark.customjoinmessage.Listeners;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.dark.customjoinmessage.CustomJoinMessage;
 
 import java.util.List;
 import java.util.regex.Pattern;

@@ -1,10 +1,11 @@
-package org.dark.customjoinmessage;
+package org.dark.customjoinmessage.Commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.dark.customjoinmessage.CustomJoinMessage;
 
 public class CJMCommand implements CommandExecutor {
     private final CustomJoinMessage plugin;

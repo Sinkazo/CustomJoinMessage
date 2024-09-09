@@ -1,4 +1,4 @@
-package org.dark.customjoinmessage;
+package org.dark.customjoinmessage.Listeners;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.event.EventHandler;
@@ -7,6 +7,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.ChatColor;
+import org.dark.customjoinmessage.CustomJoinMessage;
 
 import java.util.UUID;
 

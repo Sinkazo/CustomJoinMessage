@@ -1,4 +1,4 @@
-package org.dark.customjoinmessage;
+package org.dark.customjoinmessage.Utilities;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
