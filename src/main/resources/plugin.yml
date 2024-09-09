@@ -1,5 +1,5 @@
 name: CustomJoinMessage
-version: '${version}'
+version: '1.0.1'
 main: org.dark.customjoinmessage.CustomJoinMessage
 api-version: '1.21'
 softdepend:
