@@ -29,6 +29,9 @@ public class PlayerEventListener implements Listener {
 
         // Get the player's custom join message
         String customJoinMessage = plugin.getJoinMessage(playerId);
+        if (customJoinMessage == null) {
+            customJoinMessage = ""; // Default value if null
+        }
 
         // Replace placeholders
         String finalMessage = baseJoinMessage.replace("%playerjoinmessage%", customJoinMessage)
@@ -56,6 +59,9 @@ public class PlayerEventListener implements Listener {
 
         // Get the player's custom quit message
         String customQuitMessage = plugin.getQuitMessage(playerId);
+        if (customQuitMessage == null) {
+            customQuitMessage = ""; // Default value if null
+        }
 
         // Replace placeholders
         String finalMessage = baseQuitMessage.replace("%playerquitmessage%", customQuitMessage)

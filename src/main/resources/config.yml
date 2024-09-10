@@ -1,10 +1,12 @@
 # MySQL configuration
 mysql:
-  host: "localhost"         # MySQL server address
-  port: 3306                # MySQL server port (default 3306)
-  database: "mydatabase"    # Database name
-  username: "root"          # Database user
-  password: "password"      # User password
+  enabled: false            # Set this to true to use MySQL, false to use local storage
+  host: "localhost"        # MySQL server address
+  port: 3306               # MySQL server port (default 3306)
+  database: "mydatabase"   # Database name
+  username: "root"         # Database user
+  password: "password"     # User password
+
 
 # Predetermined join and quit messages
 messages:

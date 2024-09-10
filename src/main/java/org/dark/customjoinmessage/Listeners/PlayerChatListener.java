@@ -33,10 +33,11 @@ public class PlayerChatListener implements Listener {
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         if (plugin.isPlayerConfiguring(player.getUniqueId())) {
+            event.setCancelled(true); // Cancel the event to prevent sending the message
+
             String message = event.getMessage();
 
             if (containsBlockedWord(message)) {
-                event.setCancelled(true);
                 // Get the message from config.yml and translate color codes
                 String blockedMessage = ChatColor.translateAlternateColorCodes('&',
                         plugin.getConfig().getString("messages.blocked_message", "&cYour message contains a prohibited word and has been cancelled."));
@@ -46,7 +47,6 @@ public class PlayerChatListener implements Listener {
             }
 
             if (message.equalsIgnoreCase("cancel")) {
-                event.setCancelled(true);
                 // Get the message from config.yml and translate color codes
                 String cancelMessage = ChatColor.translateAlternateColorCodes('&',
                         plugin.getConfig().getString("messages.cancel_message", "&eMessage configuration has been cancelled."));
@@ -60,6 +60,7 @@ public class PlayerChatListener implements Listener {
             }
 
             plugin.setPlayerMessage(player.getUniqueId(), message, plugin.isConfiguringJoinMessage(player.getUniqueId()));
+
             // Get the message from config.yml and translate color codes
             String setMessage = ChatColor.translateAlternateColorCodes('&',
                     plugin.getConfig().getString("messages.set_message", "&aYour message has been set to: &f%message%"));
@@ -70,10 +71,10 @@ public class PlayerChatListener implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        Player p = event.getPlayer();
+        Player player = event.getPlayer();
 
-        if (plugin.isPlayerConfiguring(p.getUniqueId())) {
-            plugin.setPlayerConfiguring(p.getUniqueId(), false);
+        if (plugin.isPlayerConfiguring(player.getUniqueId())) {
+            plugin.setPlayerConfiguring(player.getUniqueId(), false);
         }
     }
 
