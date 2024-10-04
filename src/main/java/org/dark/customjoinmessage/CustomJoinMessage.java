@@ -8,7 +8,6 @@ import org.dark.customjoinmessage.Listeners.PlayerChatListener;
 import org.dark.customjoinmessage.Listeners.PlayerEventListener;
 import org.dark.customjoinmessage.Utilities.DatabaseManager;
 import org.dark.customjoinmessage.Utilities.FileManager;
-import org.dark.customjoinmessage.Utilities.LocalStorageManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,11 +16,9 @@ import java.util.UUID;
 public final class CustomJoinMessage extends JavaPlugin {
 
     private DatabaseManager databaseManager;
-    private LocalStorageManager localStorageManager;
     private FileManager fileManager;
     private PlayerChatListener playerChatListener;
     private boolean placeholderAPIEnabled = false;
-    private boolean usingLocalStorage = false;
 
     private final Map<UUID, Boolean> playerConfiguring = new HashMap<>();
     private final Map<UUID, Boolean> configuringJoinMessage = new HashMap<>();
@@ -33,14 +30,10 @@ public final class CustomJoinMessage extends JavaPlugin {
         saveDefaultConfig();
         fileManager = new FileManager(this);
 
-        if (getConfig().getBoolean("mysql.enabled", false)) {
-            databaseManager = new DatabaseManager(this);
-            databaseManager.connect();
-            databaseManager.loadMessagesFromDatabase(playerJoinMessages, playerQuitMessages);
-        } else {
-            usingLocalStorage = true;
-            localStorageManager = new LocalStorageManager(this);
-        }
+        // Inicializar DatabaseManager (ahora maneja tanto MySQL como SQLite)
+        databaseManager = new DatabaseManager(this);
+        databaseManager.connect();
+        databaseManager.loadMessagesFromDatabase(playerJoinMessages, playerQuitMessages);
 
         playerChatListener = new PlayerChatListener(this);
         registerCommandsAndListeners();
@@ -50,10 +43,15 @@ public final class CustomJoinMessage extends JavaPlugin {
     @Override
     public void onDisable() {
         if (databaseManager != null) {
+            // Guardar todos los mensajes antes de cerrar
+            for (UUID playerId : playerJoinMessages.keySet()) {
+                databaseManager.saveMessageToDatabase(
+                        playerId,
+                        playerJoinMessages.get(playerId),
+                        playerQuitMessages.get(playerId)
+                );
+            }
             databaseManager.closeConnection();
-        }
-        if (localStorageManager != null) {
-            localStorageManager.saveDataToFile(playerJoinMessages, playerQuitMessages);
         }
     }
 
@@ -111,11 +109,13 @@ public final class CustomJoinMessage extends JavaPlugin {
         } else {
             playerQuitMessages.put(playerId, message);
         }
-        if (usingLocalStorage) {
-            localStorageManager.saveDataToFile(playerJoinMessages, playerQuitMessages);
-        } else {
-            databaseManager.saveMessageToDatabase(playerId, playerJoinMessages.get(playerId), playerQuitMessages.get(playerId));
-        }
+
+        // Guardar inmediatamente en la base de datos
+        databaseManager.saveMessageToDatabase(
+                playerId,
+                playerJoinMessages.get(playerId),
+                playerQuitMessages.get(playerId)
+        );
     }
 
     public String getJoinMessage(UUID playerId) {
@@ -132,5 +132,9 @@ public final class CustomJoinMessage extends JavaPlugin {
 
     public FileManager getFileManager() {
         return fileManager;
+    }
+
+    public DatabaseManager getDatabaseManager() {
+        return databaseManager;
     }
 }

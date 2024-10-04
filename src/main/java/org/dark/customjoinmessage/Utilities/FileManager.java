@@ -10,42 +10,20 @@ import java.io.IOException;
 public class FileManager {
     private final JavaPlugin plugin;
     private FileConfiguration config;
-    private FileConfiguration dataConfig;
-    private File dataFile;
 
     public FileManager(JavaPlugin plugin) {
         this.plugin = plugin;
         loadConfig();
-        loadDataConfig();
     }
 
     private void loadConfig() {
+        // No necesitamos crear el config.yml aquí ya que se hace en la clase principal
         File configFile = new File(plugin.getDataFolder(), "config.yml");
-
-        if (!configFile.exists()) {
-            plugin.saveResource("config.yml", false);
-        }
-
         config = YamlConfiguration.loadConfiguration(configFile);
-    }
-
-    private void loadDataConfig() {
-        dataFile = new File(plugin.getDataFolder(), "data.yml");
-
-        if (!dataFile.exists()) {
-            dataFile.getParentFile().mkdirs();
-            plugin.saveResource("data.yml", false);
-        }
-
-        dataConfig = YamlConfiguration.loadConfiguration(dataFile);
     }
 
     public FileConfiguration getConfig() {
         return config;
-    }
-
-    public FileConfiguration getDataConfig() {
-        return dataConfig;
     }
 
     public void saveConfig() {
@@ -56,19 +34,7 @@ public class FileManager {
         }
     }
 
-    public void saveDataConfig() {
-        try {
-            dataConfig.save(dataFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void reloadConfig() {
         loadConfig();
-    }
-
-    public void reloadDataConfig() {
-        loadDataConfig();
     }
 }

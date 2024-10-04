@@ -1,6 +1,6 @@
 # MySQL configuration
 mysql:
-  enabled: false            # Set this to true to use MySQL, false to use local storage
+  enabled: false            # Set this to true to use MySQL, false to use SQLite
   host: "localhost"        # MySQL server address
   port: 3306               # MySQL server port (default 3306)
   database: "mydatabase"   # Database name

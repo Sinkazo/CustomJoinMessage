@@ -3,6 +3,7 @@ package org.dark.customjoinmessage.Utilities;
 import org.bukkit.Bukkit;
 import org.dark.customjoinmessage.CustomJoinMessage;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -15,21 +16,48 @@ import java.util.UUID;
 public class DatabaseManager {
     private Connection connection;
     private final CustomJoinMessage plugin;
+    private final boolean useMySQL;
 
     public DatabaseManager(CustomJoinMessage plugin) {
         this.plugin = plugin;
+        this.useMySQL = plugin.getFileManager().getConfig().getBoolean("mysql.enabled", false);
     }
 
     public void connect() {
+        if (useMySQL) {
+            connectToMySQL();
+        } else {
+            connectToSQLite();
+        }
+        createTablesIfNotExists();
+    }
+
+    private void connectToMySQL() {
         try {
             String url = "jdbc:mysql://" + plugin.getFileManager().getConfig().getString("mysql.host") + ":" +
-                    plugin.getFileManager().getConfig().getInt("mysql.port") + "/" + plugin.getFileManager().getConfig().getString("mysql.database");
-            connection = DriverManager.getConnection(url, plugin.getFileManager().getConfig().getString("mysql.username"),
+                    plugin.getFileManager().getConfig().getInt("mysql.port") + "/" +
+                    plugin.getFileManager().getConfig().getString("mysql.database");
+            connection = DriverManager.getConnection(url,
+                    plugin.getFileManager().getConfig().getString("mysql.username"),
                     plugin.getFileManager().getConfig().getString("mysql.password"));
-            plugin.getLogger().info("Database connected successfully.");
-            createTablesIfNotExists();
+            plugin.getLogger().info("MySQL database connected successfully.");
         } catch (SQLException e) {
-            plugin.getLogger().severe("Could not establish a connection to the database. Using local storage instead.");
+            plugin.getLogger().severe("Could not establish a connection to MySQL. Falling back to SQLite.");
+            connectToSQLite();
+        }
+    }
+
+    private void connectToSQLite() {
+        try {
+            File databaseFile = new File(plugin.getDataFolder(), "data.db");
+            if (!databaseFile.exists()) {
+                databaseFile.getParentFile().mkdirs();
+            }
+            String url = "jdbc:sqlite:" + databaseFile.getAbsolutePath();
+            connection = DriverManager.getConnection(url);
+            plugin.getLogger().info("SQLite database connected successfully.");
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Could not establish a connection to SQLite database.");
             e.printStackTrace();
         }
     }
@@ -37,7 +65,7 @@ public class DatabaseManager {
     private void createTablesIfNotExists() {
         try (Statement stmt = connection.createStatement()) {
             String createTableSQL = "CREATE TABLE IF NOT EXISTS player_messages (" +
-                    "uuid CHAR(36) PRIMARY KEY, " +
+                    "uuid VARCHAR(36) PRIMARY KEY, " +
                     "join_message TEXT DEFAULT '', " +
                     "quit_message TEXT DEFAULT '')";
             stmt.execute(createTableSQL);
@@ -66,8 +94,7 @@ public class DatabaseManager {
 
     public void saveMessageToDatabase(UUID playerId, String joinMessage, String quitMessage) {
         try (PreparedStatement stmt = connection.prepareStatement(
-                "INSERT INTO player_messages (uuid, join_message, quit_message) VALUES (?, ?, ?) " +
-                        "ON DUPLICATE KEY UPDATE join_message = VALUES(join_message), quit_message = VALUES(quit_message)")) {
+                "INSERT OR REPLACE INTO player_messages (uuid, join_message, quit_message) VALUES (?, ?, ?)")) {
             stmt.setString(1, playerId.toString());
             stmt.setString(2, joinMessage);
             stmt.setString(3, quitMessage);
