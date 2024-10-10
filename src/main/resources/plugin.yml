@@ -1,5 +1,5 @@
 name: CustomJoinMessage
-version: '1.0.5'
+version: '1.0.6'
 main: org.dark.customjoinmessage.CustomJoinMessage
 api-version: '1.20'
 softdepend:
@@ -7,5 +7,8 @@ softdepend:
 commands:
   cjm:
     description: Allow players to set a custom join and quit message.
-    usage: /<command> [reload|setjoinmessage|setquitmessage]
+    usage: /<command> [gui|setjoinmessage|setquitmessage]
     aliases: [customjoinmessage]
+  acjm:
+    description: Admin commands for cjm.
+    usage: /acjm (reload/showjoinmessage/showquitmessage/setjoinmessage/setquitmessage/deljoinmessage) (nickname)

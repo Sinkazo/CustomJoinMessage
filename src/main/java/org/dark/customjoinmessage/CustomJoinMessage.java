@@ -3,7 +3,9 @@ package org.dark.customjoinmessage;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.dark.customjoinmessage.Commands.ACJMCommand;
 import org.dark.customjoinmessage.Commands.CJMCommand;
+import org.dark.customjoinmessage.Utilities.MessagesGUI;
 import org.dark.customjoinmessage.Listeners.PlayerChatListener;
 import org.dark.customjoinmessage.Listeners.PlayerEventListener;
 import org.dark.customjoinmessage.Utilities.DatabaseManager;
@@ -18,6 +20,7 @@ public final class CustomJoinMessage extends JavaPlugin {
     private DatabaseManager databaseManager;
     private FileManager fileManager;
     private PlayerChatListener playerChatListener;
+    private MessagesGUI messagesGUI;
     private boolean placeholderAPIEnabled = false;
 
     private final Map<UUID, Boolean> playerConfiguring = new HashMap<>();
@@ -30,10 +33,13 @@ public final class CustomJoinMessage extends JavaPlugin {
         saveDefaultConfig();
         fileManager = new FileManager(this);
 
-        // Inicializar DatabaseManager (ahora maneja tanto MySQL como SQLite)
+        // Inicializar DatabaseManager
         databaseManager = new DatabaseManager(this);
         databaseManager.connect();
         databaseManager.loadMessagesFromDatabase(playerJoinMessages, playerQuitMessages);
+
+        // Inicializar MessagesGUI
+        messagesGUI = new MessagesGUI(this);
 
         playerChatListener = new PlayerChatListener(this);
         registerCommandsAndListeners();
@@ -53,6 +59,11 @@ public final class CustomJoinMessage extends JavaPlugin {
             }
             databaseManager.closeConnection();
         }
+
+        // Cerrar todos los inventarios abiertos
+        if (messagesGUI != null) {
+            messagesGUI.closeAll();
+        }
     }
 
     @Override
@@ -69,14 +80,22 @@ public final class CustomJoinMessage extends JavaPlugin {
         this.getCommand("cjm").setExecutor(cjmCommand);
         this.getCommand("cjm").setTabCompleter(cjmCommand);
 
+        ACJMCommand acjmCommand = new ACJMCommand(this);
+        this.getCommand("acjm").setExecutor(acjmCommand);
+
         getServer().getPluginManager().registerEvents(playerChatListener, this);
         getServer().getPluginManager().registerEvents(new PlayerEventListener(this), this);
+        getServer().getPluginManager().registerEvents(messagesGUI, this);
     }
 
     private void checkForPlaceholderAPI() {
         Plugin placeholderAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI");
         placeholderAPIEnabled = placeholderAPI != null;
         getLogger().info(placeholderAPIEnabled ? "PlaceholderAPI found and enabled." : "PlaceholderAPI not found.");
+    }
+
+    public MessagesGUI getMessagesGUI() {
+        return messagesGUI;
     }
 
     public Map<UUID, String> getPlayerJoinMessages() {
@@ -116,6 +135,7 @@ public final class CustomJoinMessage extends JavaPlugin {
                 playerJoinMessages.get(playerId),
                 playerQuitMessages.get(playerId)
         );
+
     }
 
     public String getJoinMessage(UUID playerId) {
@@ -137,4 +157,15 @@ public final class CustomJoinMessage extends JavaPlugin {
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
     }
+
+    public void reloadPlayerMessages() {
+        playerJoinMessages.clear();  // Limpiar los mensajes actuales antes de recargar
+        playerQuitMessages.clear();
+
+        // Cargar los mensajes nuevamente desde la base de datos
+        databaseManager.loadMessagesFromDatabase(playerJoinMessages, playerQuitMessages);
+
+        getLogger().info("Mensajes de entrada y salida recargados desde la base de datos.");
+    }
+
 }

@@ -1,36 +1,91 @@
 # MySQL configuration
 mysql:
-  enabled: false            # Set this to true to use MySQL, false to use SQLite
-  host: "localhost"        # MySQL server address
-  port: 3306               # MySQL server port (default 3306)
-  database: "mydatabase"   # Database name
-  username: "root"         # Database user
-  password: "password"     # User password
+  enabled: false
+  host: "localhost"
+  port: 3306
+  database: "mydatabase"
+  username: "root"
+  password: "password"
 
-
-# Predetermined join and quit messages
+# Messages configuration
 messages:
-  #You can use ANY PlaceholderAPI. Example: %luckperms_prefix%, %server_online%, etc.
-  join: "&f[&a+&f] %player% &ahas joinned &7(&6%playerjoinmessage%&7)"
+  join: "&f[&a+&f] %player% &ahas joined &7(&6%playerjoinmessage%&7)"
   quit: "&f[&c-&f] %player% &chas disconnected &7(&6%playerquitmessage%&7)"
 
   blocked_message: "&cYour message contains a prohibited word and has been cancelled."
   cancel_message: "&eMessage configuration has been cancelled."
-
   console_only: "&cThis command can only be used by players."
   no_permission: "&cYou don't have sufficient permissions."
-
   config_reloaded: "&aConfig reloaded successfully!"
+
+  # New messages for ACJM command
+  player_not_found: "&cCouldn't find player: %player%"
+  player_not_registered: "&cPlayer %player% is not registered in the database."
+  unknown_subcommand: "&cUnknown subcommand. Use /acjm for help."
+  setjoin_usage: "&cIncorrect usage. Use: /acjm setjoinmessage <player> <message>"
+  setquit_usage: "&cIncorrect usage. Use: /acjm setquitmessage <player> <message>"
+
+  show_join_message: "&aJoin message for %player%: %message%"
+  show_quit_message: "&aQuit message for %player%: %message%"
+  no_join_message: "&cNo join message set for %player%"
+  no_quit_message: "&cNo quit message set for %player%"
+
+  join_message_set: "&aJoin message set for %player%"
+  quit_message_set: "&aQuit message set for %player%"
+  join_message_deleted: "&aJoin message deleted for %player%"
+  quit_message_deleted: "&aQuit message deleted for %player%"
+
+  # Help messages for admins
+  help:
+    - "&e=== CustomJoinMessage Commands ==="
+    - "&6/acjm reload &f- Reload plugin configuration"
+    - "&6/acjm showjoinmessage <player> &f- Show join message"
+    - "&6/acjm showquitmessage <player> &f- Show quit message"
+    - "&6/acjm setjoinmessage <player> <message> &f- Set join message"
+    - "&6/acjm setquitmessage <player> <message> &f- Set quit message"
+    - "&6/acjm deljoinmessage <player> &f- Delete join message"
+    - "&6/acjm delquitmessage <player> &f- Delete quit message"
 
   set_message: "&aYour message has been set to: &f%message%"
   config_title: "&eConfiguration"
   join_subtitle: "&aWrite your join message in the chat"
   quit_subtitle: "&aWrite your quit message in the chat"
   config_mode: "&6Now you are in configuration mode. Type &c'cancel' &6to exit."
+  invalid_command: "&cInvalid command. Usage: /cjm gui | setjoinmessage | setquitmessage"
 
-  invalid_command: "&cInvalid command. Usage: /cjm setjoinmessage | setquitmessage | reload"
+inventory:
+  title: "&eCustom Inventory"
+  size: 27
+  current_label: "&7Current: &f"
+
+  slots:
+    join_message:
+      material: "PAPER"
+      name: "&2&lJoin Message"
+      lore:
+        - ""
+        - "&e➥ &aClick to set your join message"
+      slot: 12
+
+    quit_message:
+      material: "PAPER"
+      name: "&4&lQuit Message"
+      lore:
+        - ""
+        - "&e➥ &cClick to set your quit message"
+      slot: 14
+
+    filler:
+      material: "BLACK_STAINED_GLASS_PANE"
+      name: "&8"
+      slot: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+
 # List of blocked words
 blocked_words:
   - idiot
   - nigger
   - fuck
+  - shit
+  - asshole
+  - bitch
+  - bastard

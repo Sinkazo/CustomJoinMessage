@@ -64,7 +64,11 @@ public class PlayerChatListener implements Listener {
             // Get the message from config.yml and translate color codes
             String setMessage = ChatColor.translateAlternateColorCodes('&',
                     plugin.getConfig().getString("messages.set_message", "&aYour message has been set to: &f%message%"));
-            player.sendMessage(setMessage.replace("%message%", message));
+
+            // Translate color codes for the message before replacing it
+            String coloredMessage = ChatColor.translateAlternateColorCodes('&', message);
+            player.sendMessage(setMessage.replace("%message%", coloredMessage));
+
             plugin.setPlayerConfiguring(player.getUniqueId(), false);
         }
     }
