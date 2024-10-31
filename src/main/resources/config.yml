@@ -7,6 +7,9 @@ mysql:
   username: "root"
   password: "password"
 
+message_limits:
+  max_characters: 40  # Maximum number of characters allowed
+
 # Messages configuration
 messages:
   join: "&f[&a+&f] %player% &ahas joined &7(&6%playerjoinmessage%&7)"
@@ -17,6 +20,9 @@ messages:
   console_only: "&cThis command can only be used by players."
   no_permission: "&cYou don't have sufficient permissions."
   config_reloaded: "&aConfig reloaded successfully!"
+
+  character_limit: "&cYour message exceeds the maximum limit of %limit% characters. Please, try again!"
+  character_limit_after_placeholder: "&cYour message exceeds the character limit after placeholder processing."
 
   # New messages for ACJM command
   player_not_found: "&cCouldn't find player: %player%"
@@ -56,14 +62,13 @@ messages:
 inventory:
   title: "&eCustom Inventory"
   size: 27
-  current_label: "&7Current: &f"
 
   slots:
     join_message:
       material: "PAPER"
       name: "&2&lJoin Message"
       lore:
-        - ""
+        - "&7Current join message: %playerjoinmessage%"
         - "&e➥ &aClick to set your join message"
       slot: 12
 
@@ -71,7 +76,7 @@ inventory:
       material: "PAPER"
       name: "&4&lQuit Message"
       lore:
-        - ""
+        - "&7Current quit message: %playerquitmessage%"
         - "&e➥ &cClick to set your quit message"
       slot: 14
 

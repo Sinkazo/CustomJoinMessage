@@ -41,10 +41,22 @@ public class MessagesGUI implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
+    // Método para convertir códigos %% a &
+    private String convertColorCodes(String message) {
+        if (message == null) return "";
+        return message.replace("%%", "&");
+    }
+
+    // Método para aplicar colores a un mensaje
+    private String colorize(String message) {
+        if (message == null) return "";
+        return ChatColor.translateAlternateColorCodes('&', message);
+    }
+
     public void open(Player player) {
         if (isReloading) return;
 
-        String title = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("inventory.title", "&eCustom Inventory"));
+        String title = colorize(plugin.getConfig().getString("inventory.title", "&eCustom Inventory"));
         int size = plugin.getConfig().getInt("inventory.size", 9);
         Inventory inventory = Bukkit.createInventory(holder, size, title);
         updateInventoryItems(inventory, player);
@@ -55,18 +67,21 @@ public class MessagesGUI implements Listener {
     private void updateInventoryItems(Inventory inventory, Player player) {
         inventory.clear();
 
-        String joinMessage = plugin.getPlayerJoinMessages().getOrDefault(player.getUniqueId(), "");
-        String quitMessage = plugin.getPlayerQuitMessages().getOrDefault(player.getUniqueId(), "");
+        // Convertir y colorear los mensajes
+        String rawJoinMessage = plugin.getPlayerJoinMessages().getOrDefault(player.getUniqueId(), "");
+        String rawQuitMessage = plugin.getPlayerQuitMessages().getOrDefault(player.getUniqueId(), "");
 
-        // Mostrar los ítems de mensaje según permisos, o mostrar una Barrier si no tiene permisos
+        String joinMessage = convertColorCodes(rawJoinMessage);
+        String quitMessage = convertColorCodes(rawQuitMessage);
+
         if (player.hasPermission("cjm.join")) {
-            setConfigItem(inventory, "join_message", joinMessage);
+            setConfigItem(inventory, "join_message", joinMessage, player);
         } else {
             setBarrierItem(inventory, "join_message", "&cYou don't have permissions.");
         }
 
         if (player.hasPermission("cjm.quit")) {
-            setConfigItem(inventory, "quit_message", quitMessage);
+            setConfigItem(inventory, "quit_message", quitMessage, player);
         } else {
             setBarrierItem(inventory, "quit_message", "&cYou don't have permissions.");
         }
@@ -74,73 +89,57 @@ public class MessagesGUI implements Listener {
         setFillerItems(inventory);
     }
 
-    public void updateAllOpenInventories() {
-        if (isReloading) return;
-
-        for (Map.Entry<UUID, Inventory> entry : openInventories.entrySet()) {
-            Player player = Bukkit.getPlayer(entry.getKey());
-            if (player != null && player.isOnline()) {
-                Inventory newInventory = Bukkit.createInventory(holder,
-                        entry.getValue().getSize(),
-                        ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("inventory.title", "&eCustom Inventory")));
-                updateInventoryItems(newInventory, player);
-                player.openInventory(newInventory);
-                openInventories.put(entry.getKey(), newInventory);
-            }
-        }
-    }
-
-    public void closeAll() {
-        for (UUID uuid : openInventories.keySet()) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null && player.isOnline()) {
-                player.closeInventory();
-            }
-        }
-        openInventories.clear();
-    }
-
-    private void setConfigItem(Inventory inventory, String path, String message) {
+    private void setConfigItem(Inventory inventory, String path, String message, Player player) {
         String materialName = plugin.getConfig().getString("inventory.slots." + path + ".material", "PAPER");
         Material material = Material.matchMaterial(materialName);
         if (material == null) material = Material.PAPER;
 
-        String name = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("inventory.slots." + path + ".name", "&eItem"));
-        List<String> lore = plugin.getConfig().getStringList("inventory.slots." + path + ".lore");
-        lore.replaceAll(line -> ChatColor.translateAlternateColorCodes('&', line));
+        String name = colorize(plugin.getConfig().getString("inventory.slots." + path + ".name", "&eItem"));
+        List<String> lore = new ArrayList<>(plugin.getConfig().getStringList("inventory.slots." + path + ".lore"));
+
+        // Reemplazar las variables en el lore y aplicar colores
+        lore.replaceAll(line -> {
+            String processedLine = line;
+            if (processedLine.contains("%playerjoinmessage%")) {
+                String joinMessage = plugin.getPlayerJoinMessages().getOrDefault(player.getUniqueId(), "");
+                processedLine = processedLine.replace("%playerjoinmessage%", colorize(convertColorCodes(joinMessage)));
+            }
+            if (processedLine.contains("%playerquitmessage%")) {
+                String quitMessage = plugin.getPlayerQuitMessages().getOrDefault(player.getUniqueId(), "");
+                processedLine = processedLine.replace("%playerquitmessage%", colorize(convertColorCodes(quitMessage)));
+            }
+            return colorize(processedLine);
+        });
+
         int slot = plugin.getConfig().getInt("inventory.slots." + path + ".slot", -1);
 
         if (slot >= 0 && slot < inventory.getSize()) {
-            ItemStack item = createMessageItem(material, name, lore, message);
+            ItemStack item = createMessageItem(material, name, lore);
             inventory.setItem(slot, item);
         }
     }
 
+    // El resto del código permanece igual...
+    // (Mantener los métodos setBarrierItem, createMessageItem, setFillerItems, createFillerItem, etc.)
     private void setBarrierItem(Inventory inventory, String path, String noPermissionMessage) {
         Material material = Material.BARRIER;
-        String name = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("inventory.slots." + path + ".name", "&cNo Permission"));
+        String name = colorize(plugin.getConfig().getString("inventory.slots." + path + ".name", "&cNo Permission"));
         List<String> lore = new ArrayList<>();
-        lore.add(ChatColor.translateAlternateColorCodes('&', noPermissionMessage));
+        lore.add(colorize(noPermissionMessage));
         int slot = plugin.getConfig().getInt("inventory.slots." + path + ".slot", -1);
 
         if (slot >= 0 && slot < inventory.getSize()) {
-            ItemStack item = createMessageItem(material, name, lore, "");
+            ItemStack item = createMessageItem(material, name, lore);
             inventory.setItem(slot, item);
         }
     }
 
-    private ItemStack createMessageItem(Material material, String name, List<String> lore, String message) {
+    private ItemStack createMessageItem(Material material, String name, List<String> lore) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.setDisplayName(name);
-            List<String> updatedLore = new ArrayList<>();
-            if (!message.isEmpty()) {
-                String currentLabel = plugin.getConfig().getString("inventory.current_label", "&7Current: &f");
-                updatedLore.add(ChatColor.translateAlternateColorCodes('&', currentLabel + message));
-            }
-            updatedLore.addAll(lore);
-            meta.setLore(updatedLore);
+            meta.setLore(lore);
             item.setItemMeta(meta);
         }
         return item;
@@ -152,7 +151,7 @@ public class MessagesGUI implements Listener {
         Material material = Material.matchMaterial(materialName);
         if (material == null) material = Material.BLACK_STAINED_GLASS_PANE;
 
-        String name = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("inventory.slots.filler.name", "&8"));
+        String name = colorize(plugin.getConfig().getString("inventory.slots.filler.name", "&8"));
 
         ItemStack filler = createFillerItem(material, name);
         for (int slot : fillerSlots) {
@@ -192,7 +191,6 @@ public class MessagesGUI implements Listener {
         int joinSlot = plugin.getConfig().getInt("inventory.slots.join_message.slot", -1);
         int quitSlot = plugin.getConfig().getInt("inventory.slots.quit_message.slot", -1);
 
-        // Si el jugador hace clic en un ítem sin permisos, no pasa nada
         if ((slot == joinSlot && !player.hasPermission("cjm.join")) ||
                 (slot == quitSlot && !player.hasPermission("cjm.quit"))) {
             return;
@@ -210,11 +208,11 @@ public class MessagesGUI implements Listener {
         plugin.setPlayerConfiguring(player.getUniqueId(), true);
         plugin.setConfiguringJoinMessage(player.getUniqueId(), isJoinMessage);
 
-        String configMode = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("messages.config_mode", "&6Now you are in configuration mode. Type &c'cancel' &6to exit."));
-        String title = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("messages.config_title", "&eConfiguration"));
+        String configMode = colorize(plugin.getConfig().getString("messages.config_mode", "&6Now you are in configuration mode. Type &c'cancel' &6to exit."));
+        String title = colorize(plugin.getConfig().getString("messages.config_title", "&eConfiguration"));
         String subtitle = isJoinMessage ?
-                ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("messages.join_subtitle", "&aWrite your join message in the chat")) :
-                ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("messages.quit_subtitle", "&aWrite your quit message in the chat"));
+                colorize(plugin.getConfig().getString("messages.join_subtitle", "&aWrite your join message in the chat")) :
+                colorize(plugin.getConfig().getString("messages.quit_subtitle", "&aWrite your quit message in the chat"));
 
         player.sendTitle(title, subtitle, 10, 70, 20);
         player.sendMessage(configMode);
@@ -233,5 +231,31 @@ public class MessagesGUI implements Listener {
         plugin.reloadConfig();
         updateAllOpenInventories();
         isReloading = false;
+    }
+
+    public void updateAllOpenInventories() {
+        if (isReloading) return;
+
+        for (Map.Entry<UUID, Inventory> entry : openInventories.entrySet()) {
+            Player player = Bukkit.getPlayer(entry.getKey());
+            if (player != null && player.isOnline()) {
+                Inventory newInventory = Bukkit.createInventory(holder,
+                        entry.getValue().getSize(),
+                        colorize(plugin.getConfig().getString("inventory.title", "&eCustom Inventory")));
+                updateInventoryItems(newInventory, player);
+                player.openInventory(newInventory);
+                openInventories.put(entry.getKey(), newInventory);
+            }
+        }
+    }
+
+    public void closeAll() {
+        for (UUID uuid : openInventories.keySet()) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null && player.isOnline()) {
+                player.closeInventory();
+            }
+        }
+        openInventories.clear();
     }
 }

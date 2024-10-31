@@ -33,23 +33,34 @@ public class PlayerChatListener implements Listener {
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         if (plugin.isPlayerConfiguring(player.getUniqueId())) {
-            event.setCancelled(true); // Cancel the event to prevent sending the message
+            event.setCancelled(true);
 
             String message = event.getMessage();
 
+            // Verificar límites de caracteres
+            int maxChars = plugin.getConfig().getInt("message_limits.max_characters", 100);
+            if (message.length() > maxChars) {
+                String limitMessage = ChatColor.translateAlternateColorCodes('&',
+                        plugin.getConfig().getString("messages.character_limit",
+                                        "&cYour message exceeds the maximum limit of %limit% characters.")
+                                .replace("%limit%", String.valueOf(maxChars)));
+                player.sendMessage(limitMessage);
+                return;
+            }
+
             if (containsBlockedWord(message)) {
-                // Get the message from config.yml and translate color codes
                 String blockedMessage = ChatColor.translateAlternateColorCodes('&',
-                        plugin.getConfig().getString("messages.blocked_message", "&cYour message contains a prohibited word and has been cancelled."));
+                        plugin.getConfig().getString("messages.blocked_message",
+                                "&cYour message contains a prohibited word and has been cancelled."));
                 player.sendMessage(blockedMessage);
                 plugin.setPlayerConfiguring(player.getUniqueId(), false);
                 return;
             }
 
             if (message.equalsIgnoreCase("cancel")) {
-                // Get the message from config.yml and translate color codes
                 String cancelMessage = ChatColor.translateAlternateColorCodes('&',
-                        plugin.getConfig().getString("messages.cancel_message", "&eMessage configuration has been cancelled."));
+                        plugin.getConfig().getString("messages.cancel_message",
+                                "&eMessage configuration has been cancelled."));
                 player.sendMessage(cancelMessage);
                 plugin.setPlayerConfiguring(player.getUniqueId(), false);
                 return;
@@ -59,13 +70,21 @@ public class PlayerChatListener implements Listener {
                 message = PlaceholderAPI.setPlaceholders(player, message);
             }
 
+            // Verificar límite después de procesar PlaceholderAPI
+            if (message.length() > maxChars) {
+                String limitMessage = ChatColor.translateAlternateColorCodes('&',
+                        plugin.getConfig().getString("messages.character_limit_after_placeholder",
+                                        "&cYour message exceeds the character limit after processing placeholders.")
+                                .replace("%limit%", String.valueOf(maxChars)));
+                player.sendMessage(limitMessage);
+                return;
+            }
+
             plugin.setPlayerMessage(player.getUniqueId(), message, plugin.isConfiguringJoinMessage(player.getUniqueId()));
 
-            // Get the message from config.yml and translate color codes
             String setMessage = ChatColor.translateAlternateColorCodes('&',
                     plugin.getConfig().getString("messages.set_message", "&aYour message has been set to: &f%message%"));
 
-            // Translate color codes for the message before replacing it
             String coloredMessage = ChatColor.translateAlternateColorCodes('&', message);
             player.sendMessage(setMessage.replace("%message%", coloredMessage));
 
