@@ -17,7 +17,6 @@ public class FileManager {
     }
 
     private void loadConfig() {
-        // No necesitamos crear el config.yml aquí ya que se hace en la clase principal
         File configFile = new File(plugin.getDataFolder(), "config.yml");
         config = YamlConfiguration.loadConfiguration(configFile);
     }

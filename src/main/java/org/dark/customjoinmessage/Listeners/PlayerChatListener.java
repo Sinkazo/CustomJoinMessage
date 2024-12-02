@@ -37,7 +37,6 @@ public class PlayerChatListener implements Listener {
 
             String message = event.getMessage();
 
-            // Verificar límites de caracteres
             int maxChars = plugin.getConfig().getInt("message_limits.max_characters", 100);
             if (message.length() > maxChars) {
                 String limitMessage = ChatColor.translateAlternateColorCodes('&',
@@ -70,7 +69,6 @@ public class PlayerChatListener implements Listener {
                 message = PlaceholderAPI.setPlaceholders(player, message);
             }
 
-            // Verificar límite después de procesar PlaceholderAPI
             if (message.length() > maxChars) {
                 String limitMessage = ChatColor.translateAlternateColorCodes('&',
                         plugin.getConfig().getString("messages.character_limit_after_placeholder",

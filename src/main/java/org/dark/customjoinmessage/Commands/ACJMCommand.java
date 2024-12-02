@@ -109,16 +109,14 @@ public class ACJMCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
         if (args.length == 1) {
-            // Lista de subcomandos posibles
             List<String> subCommands = Arrays.asList("reload", "showjoinmessage", "showquitmessage",
                     "setjoinmessage", "setquitmessage",
                     "deljoinmessage", "delquitmessage");
             return filterStartingWith(args[0], subCommands);
         } else if (args.length == 2 && sender.hasPermission("cjm.admin")) {
-            // Para el segundo argumento (nombre del jugador)
-            return null; // Devuelve null para que Bukkit sugiera nombres de jugadores online
+            return null;
         }
-        return new ArrayList<>(); // Lista vacía si no hay sugerencias
+        return new ArrayList<>();
     }
 
     private List<String> filterStartingWith(String input, List<String> options) {

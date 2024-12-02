@@ -31,10 +31,8 @@ public class CJMCommand implements CommandExecutor, TabCompleter {
 
         Player player = (Player) sender;
 
-        // Si hay argumentos, procesamos el comando correspondiente
         if (args.length > 0) {
             if (args[0].equalsIgnoreCase("gui")) {
-                // Si el argumento es "gui", abrimos el inventario
                 plugin.getMessagesGUI().open(player);
                 return true;
             } else if (args[0].equalsIgnoreCase("setjoinmessage")) {
@@ -60,7 +58,6 @@ public class CJMCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        // Si no hay argumentos, enviamos un mensaje de uso
         String usageMessage = ChatColor.translateAlternateColorCodes('&',
                 plugin.getConfig().getString("messages.usage", "&cUsage: /cjm gui | setjoinmessage | setquitmessage | "));
         player.sendMessage(usageMessage);

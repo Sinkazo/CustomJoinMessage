@@ -78,7 +78,6 @@ public class DatabaseManager {
                     "quit_message TEXT DEFAULT '')";
             stmt.execute(createTableSQL);
 
-            // Verificar y agregar la columna player_name si no existe
             try {
                 DatabaseMetaData md = connection.getMetaData();
                 ResultSet rs = md.getColumns(null, null, "player_messages", "player_name");
@@ -133,7 +132,6 @@ public class DatabaseManager {
             return null;
         }
 
-        // Primero buscar en la base de datos
         String query = "SELECT uuid FROM player_messages WHERE LOWER(player_name) = LOWER(?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, playerName);
@@ -146,13 +144,11 @@ public class DatabaseManager {
             plugin.getLogger().warning("Error al buscar UUID en la base de datos: " + e.getMessage());
         }
 
-        // Buscar jugador online
         Player player = Bukkit.getPlayerExact(playerName);
         if (player != null) {
             return player.getUniqueId();
         }
 
-        // Buscar jugador offline
         @SuppressWarnings("deprecation")
         UUID offlineUUID = Bukkit.getOfflinePlayer(playerName).getUniqueId();
         return offlineUUID;
@@ -165,7 +161,6 @@ public class DatabaseManager {
         }
 
         try {
-            // Obtener nombre del jugador
             String playerName = null;
             Player player = Bukkit.getPlayer(playerId);
             if (player != null) {
@@ -230,7 +225,6 @@ public class DatabaseManager {
         return null;
     }
 
-    // Agregar el método closeConnection
     public void closeConnection() {
         if (connection != null) {
             try {

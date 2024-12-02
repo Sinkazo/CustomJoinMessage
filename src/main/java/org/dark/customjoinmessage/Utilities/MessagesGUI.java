@@ -67,7 +67,6 @@ public class MessagesGUI implements Listener {
     private void updateInventoryItems(Inventory inventory, Player player) {
         inventory.clear();
 
-        // Convertir y colorear los mensajes
         String rawJoinMessage = plugin.getPlayerJoinMessages().getOrDefault(player.getUniqueId(), "");
         String rawQuitMessage = plugin.getPlayerQuitMessages().getOrDefault(player.getUniqueId(), "");
 
@@ -96,8 +95,6 @@ public class MessagesGUI implements Listener {
 
         String name = colorize(plugin.getConfig().getString("inventory.slots." + path + ".name", "&eItem"));
         List<String> lore = new ArrayList<>(plugin.getConfig().getStringList("inventory.slots." + path + ".lore"));
-
-        // Reemplazar las variables en el lore y aplicar colores
         lore.replaceAll(line -> {
             String processedLine = line;
             if (processedLine.contains("%playerjoinmessage%")) {
@@ -119,8 +116,6 @@ public class MessagesGUI implements Listener {
         }
     }
 
-    // El resto del código permanece igual...
-    // (Mantener los métodos setBarrierItem, createMessageItem, setFillerItems, createFillerItem, etc.)
     private void setBarrierItem(Inventory inventory, String path, String noPermissionMessage) {
         Material material = Material.BARRIER;
         String name = colorize(plugin.getConfig().getString("inventory.slots." + path + ".name", "&cNo Permission"));

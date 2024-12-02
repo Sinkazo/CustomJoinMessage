@@ -49,7 +49,6 @@ public final class CustomJoinMessage extends JavaPlugin {
     @Override
     public void onDisable() {
         if (databaseManager != null) {
-            // Guardar todos los mensajes antes de cerrar
             for (UUID playerId : playerJoinMessages.keySet()) {
                 databaseManager.saveMessageToDatabase(
                         playerId,
@@ -129,7 +128,6 @@ public final class CustomJoinMessage extends JavaPlugin {
             playerQuitMessages.put(playerId, message);
         }
 
-        // Guardar inmediatamente en la base de datos
         databaseManager.saveMessageToDatabase(
                 playerId,
                 playerJoinMessages.get(playerId),
@@ -159,10 +157,9 @@ public final class CustomJoinMessage extends JavaPlugin {
     }
 
     public void reloadPlayerMessages() {
-        playerJoinMessages.clear();  // Limpiar los mensajes actuales antes de recargar
+        playerJoinMessages.clear();
         playerQuitMessages.clear();
 
-        // Cargar los mensajes nuevamente desde la base de datos
         databaseManager.loadMessagesFromDatabase(playerJoinMessages, playerQuitMessages);
 
         getLogger().info("Mensajes de entrada y salida recargados desde la base de datos.");
