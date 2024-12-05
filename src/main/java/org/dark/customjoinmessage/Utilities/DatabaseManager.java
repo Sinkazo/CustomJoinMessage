@@ -38,9 +38,9 @@ public class DatabaseManager {
 
             String url = String.format("jdbc:mysql://%s:%d/%s?useSSL=false", host, port, database);
             connection = DriverManager.getConnection(url, username, password);
-            plugin.getLogger().info("Conexión exitosa a MySQL.");
+            plugin.getLogger().info("Connection successful to MySQL.");
         } catch (SQLException e) {
-            plugin.getLogger().severe("No se pudo conectar a MySQL. Usando SQLite como respaldo.");
+            plugin.getLogger().severe("Cannot connect to MySQL. Using SQLite.");
             e.printStackTrace();
             connectToSQLite();
         }
@@ -54,16 +54,16 @@ public class DatabaseManager {
             }
             String url = "jdbc:sqlite:" + databaseFile.getAbsolutePath();
             connection = DriverManager.getConnection(url);
-            plugin.getLogger().info("Conexión exitosa a SQLite.");
+            plugin.getLogger().info("Connection successful to SQLite.");
         } catch (SQLException e) {
-            plugin.getLogger().severe("Error al conectar con SQLite:");
+            plugin.getLogger().severe("Error to connect to the SQLite:");
             e.printStackTrace();
         }
     }
 
     public Connection getConnection() {
         if (connection == null) {
-            plugin.getLogger().severe("La conexión a la base de datos no está inicializada.");
+            plugin.getLogger().severe("Connection to database is not inicializate.");
             return null;
         }
         return connection;
@@ -88,11 +88,11 @@ public class DatabaseManager {
                     stmt.execute(alterTableSQL);
                 }
             } catch (SQLException e) {
-                plugin.getLogger().warning("Error al verificar/agregar la columna player_name: " + e.getMessage());
+                plugin.getLogger().warning("Error adding/load the column player_name: " + e.getMessage());
             }
 
         } catch (SQLException e) {
-            plugin.getLogger().severe("Error al crear las tablas:");
+            plugin.getLogger().severe("Error loading tables:");
             e.printStackTrace();
         }
     }
@@ -115,14 +115,14 @@ public class DatabaseManager {
                         quitMessages.put(uuid, quitMessage);
                     }
                 } catch (IllegalArgumentException e) {
-                    plugin.getLogger().warning("UUID inválido encontrado en la base de datos: " + e.getMessage());
+                    plugin.getLogger().warning("Invalid UUID in the database: " + e.getMessage());
                 }
             }
 
-            plugin.getLogger().info("Cargados " + joinMessages.size() + " mensajes de entrada y " +
-                    quitMessages.size() + " mensajes de salida.");
+            plugin.getLogger().info("Loaded " + joinMessages.size() + " join messages and " +
+                    quitMessages.size() + " exit messages.");
         } catch (SQLException e) {
-            plugin.getLogger().severe("Error al cargar mensajes de la base de datos:");
+            plugin.getLogger().severe("Error loading messages from database:");
             e.printStackTrace();
         }
     }
@@ -141,7 +141,7 @@ public class DatabaseManager {
                 return UUID.fromString(uuidStr);
             }
         } catch (SQLException e) {
-            plugin.getLogger().warning("Error al buscar UUID en la base de datos: " + e.getMessage());
+            plugin.getLogger().warning("Error searching the UUID in the database: " + e.getMessage());
         }
 
         Player player = Bukkit.getPlayerExact(playerName);
@@ -156,7 +156,7 @@ public class DatabaseManager {
 
     public void saveMessageToDatabase(UUID playerId, String joinMessage, String quitMessage) {
         if (playerId == null) {
-            plugin.getLogger().severe("Intento de guardar mensaje con UUID nulo");
+            plugin.getLogger().severe("Trying to save message from a UUID null");
             return;
         }
 
@@ -190,7 +190,7 @@ public class DatabaseManager {
                 stmt.executeUpdate();
             }
         } catch (SQLException e) {
-            plugin.getLogger().severe("Error al guardar mensajes para UUID " + playerId);
+            plugin.getLogger().severe("Error saving messages to UUID " + playerId);
             e.printStackTrace();
         }
     }
@@ -204,7 +204,7 @@ public class DatabaseManager {
                 return rs.getString("join_message");
             }
         } catch (SQLException e) {
-            plugin.getLogger().severe("Error al obtener mensaje de entrada para UUID " + playerId);
+            plugin.getLogger().severe("Error getting input message for UUID " + playerId);
             e.printStackTrace();
         }
         return null;
@@ -219,7 +219,7 @@ public class DatabaseManager {
                 return rs.getString("quit_message");
             }
         } catch (SQLException e) {
-            plugin.getLogger().severe("Error al obtener mensaje de salida para UUID " + playerId);
+            plugin.getLogger().severe("Error getting output message for UUID " + playerId);
             e.printStackTrace();
         }
         return null;
@@ -229,9 +229,9 @@ public class DatabaseManager {
         if (connection != null) {
             try {
                 connection.close();
-                plugin.getLogger().info("Conexión con la base de datos cerrada correctamente.");
+                plugin.getLogger().info("Connection to the database successfully closed.");
             } catch (SQLException e) {
-                plugin.getLogger().severe("Error al cerrar la conexión con la base de datos:");
+                plugin.getLogger().severe("Error when closing the connection to the database:");
                 e.printStackTrace();
             }
         }
