@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.dark.customjoinmessage.CustomJoinMessage;
+import org.bukkit.plugin.Plugin;
 
 import java.util.UUID;
 
@@ -47,6 +48,15 @@ public class PlayerEventListener implements Listener {
 
         // Set the join message
         event.setJoinMessage(finalMessage);
+
+        // Send Discord message only if DiscordSRV is properly loaded, enabled and discord integration is enabled in config
+        if (isDiscordSRVEnabled() && plugin.getConfig().getBoolean("discord.enabled", true)) {
+            String discordMessage = ":inbox_tray: " + player.getName();
+            if (customJoinMessage != null && !customJoinMessage.isEmpty()) {
+                discordMessage += " - " + customJoinMessage;
+            }
+            sendDiscordMessage("global", discordMessage);
+        }
     }
 
     @EventHandler
@@ -77,5 +87,41 @@ public class PlayerEventListener implements Listener {
 
         // Set the quit message
         event.setQuitMessage(finalMessage);
+
+        // Send Discord message only if DiscordSRV is properly loaded, enabled and discord integration is enabled in config
+        if (isDiscordSRVEnabled() && plugin.getConfig().getBoolean("discord.enabled", true)) {
+            String discordMessage = ":outbox_tray: " + player.getName();
+            if (customQuitMessage != null && !customQuitMessage.isEmpty()) {
+                discordMessage += " - " + customQuitMessage;
+            }
+            sendDiscordMessage("global", discordMessage);
+        }
+    }
+
+    private boolean isDiscordSRVEnabled() {
+        try {
+            Plugin discordSRV = plugin.getServer().getPluginManager().getPlugin("DiscordSRV");
+            return discordSRV != null && discordSRV.isEnabled() && Class.forName("github.scarsz.discordsrv.DiscordSRV") != null;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    private void sendDiscordMessage(String channelName, String message) {
+        if (!isDiscordSRVEnabled()) return;
+
+        try {
+            Class.forName("github.scarsz.discordsrv.DiscordSRV");
+            github.scarsz.discordsrv.DiscordSRV discordSRV = github.scarsz.discordsrv.DiscordSRV.getPlugin();
+            if (discordSRV != null) {
+                github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel channel =
+                        discordSRV.getDestinationTextChannelForGameChannelName(channelName);
+                if (channel != null) {
+                    channel.sendMessage(message).queue();
+                }
+            }
+        } catch (Exception e) {
+            // Silently ignore any Discord-related errors
+        }
     }
 }

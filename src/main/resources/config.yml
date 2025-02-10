@@ -10,6 +10,10 @@ mysql:
 message_limits:
   max_characters: 40  # Maximum number of characters allowed
 
+#In case you have DiscordSRV configured correctly on your server, ignore if you don't have it.
+discord:
+  enabled: true  # Send players custom messages to DiscordSRV Channel
+
 # Messages configuration
 messages:
   join: "&f[&a+&f] %player% &ahas joined &7(&6%playerjoinmessage%&7)"

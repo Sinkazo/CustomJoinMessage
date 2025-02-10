@@ -7,6 +7,9 @@ version = '1.0.7'
 
 repositories {
     mavenCentral()
+
+    maven { url 'https://nexus.scarsz.me/content/groups/public/' } // Repositorio de DiscordSRV
+
     maven {
         name = "spigotmc-repo"
         url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
@@ -26,6 +29,7 @@ repositories {
 }
 
 dependencies {
+    compileOnly 'com.discordsrv:discordsrv:1.28.0' // DiscordSRV
     compileOnly "org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT"
     compileOnly 'me.clip:placeholderapi:2.11.6'
     compileOnly 'net.luckperms:api:5.4'

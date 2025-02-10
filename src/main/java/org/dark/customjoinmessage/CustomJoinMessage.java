@@ -44,6 +44,9 @@ public final class CustomJoinMessage extends JavaPlugin {
         playerChatListener = new PlayerChatListener(this);
         registerCommandsAndListeners();
         checkForPlaceholderAPI();
+        checkForDiscordSRV();
+
+
     }
 
     @Override
@@ -63,6 +66,26 @@ public final class CustomJoinMessage extends JavaPlugin {
         if (messagesGUI != null) {
             messagesGUI.closeAll();
         }
+    }
+
+    private boolean discordSRVEnabled = false;
+
+    private void checkForDiscordSRV() {
+        try {
+            Plugin discordSRV = Bukkit.getPluginManager().getPlugin("DiscordSRV");
+            discordSRVEnabled = discordSRV != null && discordSRV.isEnabled() &&
+                    Class.forName("github.scarsz.discordsrv.DiscordSRV") != null;
+        } catch (ClassNotFoundException e) {
+            discordSRVEnabled = false;
+        }
+        getLogger().info(discordSRVEnabled ?
+                "DiscordSRV found and enabled." :
+                "DiscordSRV not found or not properly loaded.");
+    }
+
+
+    public boolean isDiscordSRVEnabled() {
+        return discordSRVEnabled;
     }
 
     @Override
